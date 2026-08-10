@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vendre sans agence — guide de particulier à particulier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEEDE7; --card:#FBFAF6; --ink:#1B1D1E; --ink-soft:#5A5D5E;
+    --line:#D9D6CC; --line-soft:#E7E4DB;
+    --pine:#1E6B52; --pine-soft:#E3EDE7; --pine-ink:#123f30;
+    --ochre:#A96612; --ochre-soft:#F3E8D3; --ochre-ink:#754409;
+    --brick:#9E3826; --brick-soft:#F1DED8;
+    --r:11px;
+    --sans:"IBM Plex Sans",system-ui,sans-serif;
+    --serif:"IBM Plex Serif",Georgia,serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px 72px}
+  a{color:var(--pine-ink);text-underline-offset:3px}
+  h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.25;margin:0}
+
+  header.top{padding:26px 0 14px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--pine-ink);margin:0 0 8px}
+  header.top h1{font-size:27px;letter-spacing:-.01em}
+  header.top p{margin:8px 0 0;color:var(--ink-soft);max-width:56ch}
+  .save{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;
+    color:var(--ink-soft);margin-top:14px}
+  .save .dot{width:8px;height:8px;border-radius:50%;background:var(--pine)}
+
+  /* Stepper as folder tabs */
+  nav.steps{position:sticky;top:0;z-index:5;background:var(--paper);
+    padding:10px 0;margin:6px 0 22px;border-bottom:1px solid var(--line);
+    display:flex;gap:7px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  nav.steps::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;display:flex;align-items:center;gap:8px;cursor:pointer;
+    border:1px solid var(--line);background:var(--card);border-radius:9px;
+    padding:8px 12px;font-size:13px;color:var(--ink-soft);white-space:nowrap;
+    transition:border-color .15s,color .15s}
+  .tab:hover{border-color:#c3bfb2}
+  .tab .num{font-family:var(--mono);font-weight:500;width:20px;height:20px;border-radius:5px;
+    display:grid;place-items:center;background:var(--line-soft);color:var(--ink-soft);font-size:12px}
+  .tab[aria-current="true"]{border-color:var(--pine);color:var(--pine-ink);background:var(--pine-soft)}
+  .tab[aria-current="true"] .num{background:var(--pine);color:#fff}
+  .tab.done .num{background:var(--pine);color:#fff}
+  .tab.done .num::after{content:"✓"}
+  .tab.done .num span{display:none}
+
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.panel{animation:none}}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-soft);margin:0 0 6px}
+  .panel > h2{font-size:22px;margin-bottom:6px}
+  .lead{color:var(--ink-soft);margin:0 0 22px;max-width:60ch}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    padding:20px;margin:0 0 16px}
+  .card h3{font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:9px}
+  .grid2{display:grid;gap:16px}
+  @media(min-width:680px){.grid2{grid-template-columns:1fr 1fr}}
+
+  label.f{display:block;font-size:14px;font-weight:500;margin:0 0 5px;color:var(--ink)}
+  .hint{font-size:13px;color:var(--ink-soft);margin:3px 0 0}
+  input[type=text],input[type=number],select,textarea{width:100%;font:inherit;font-size:15px;
+    padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--pine);outline-offset:1px;border-color:var(--pine)}
+  textarea{resize:vertical;min-height:92px}
+  .field{margin:0 0 14px}
+  .field:last-child{margin-bottom:0}
+
+  .check{display:flex;gap:10px;align-items:flex-start;padding:9px 0;cursor:pointer;
+    border-top:1px solid var(--line-soft)}
+  .check:first-of-type{border-top:0}
+  .check input{margin-top:3px;width:17px;height:17px;accent-color:var(--pine);flex:0 0 auto}
+  .check span{font-size:14.5px;line-height:1.5}
+  .check small{display:block;color:var(--ink-soft);font-size:13px}
+
+  .pill{display:inline-block;font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:20px;
+    letter-spacing:.03em;vertical-align:middle}
+  .pill.req{background:var(--ochre-soft);color:var(--ochre-ink)}
+  .pill.ok{background:var(--pine-soft);color:var(--pine-ink)}
+
+  .note{border-left:3px solid var(--pine);background:var(--pine-soft);color:var(--pine-ink);
+    padding:12px 14px;border-radius:0 8px 8px 0;font-size:14px;margin:14px 0 0}
+  .note.warn{border-color:var(--ochre);background:var(--ochre-soft);color:var(--ochre-ink)}
+  .note.alert{border-color:var(--brick);background:var(--brick-soft);color:#7a2c1e}
+  .note strong{font-weight:600}
+
+  .links a{display:block;padding:9px 0;font-size:14.5px;border-top:1px solid var(--line-soft)}
+  .links a:first-child{border-top:0}
+
+  .annonce{font-family:var(--mono);font-size:13px;line-height:1.7;white-space:pre-wrap;
+    background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px;color:var(--ink);
+    max-height:none}
+  .btn{font:inherit;font-size:14px;font-weight:500;cursor:pointer;border-radius:8px;
+    padding:10px 16px;border:1px solid var(--pine);background:var(--pine);color:#fff}
+  .btn:hover{background:var(--pine-ink)}
+  .btn.ghost{background:transparent;color:var(--pine-ink)}
+  .btn.ghost:hover{background:var(--pine-soft)}
+  .btn.mini{padding:7px 12px;font-size:13px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+  .metric{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;
+    border-top:1px solid var(--line-soft)}
+  .metric:first-child{border-top:0}
+  .metric .lab{font-size:13.5px;color:var(--ink-soft)}
+  .metric .val{font-family:var(--mono);font-size:18px;font-weight:500}
+  .delta.pos{color:var(--pine-ink)} .delta.neg{color:var(--brick)}
+
+  .results{margin-top:8px}
+  .res-item{padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;
+    cursor:pointer;font-size:14px;margin-top:8px}
+  .res-item:hover{border-color:var(--pine)}
+
+  .navflow{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
+
+  footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);
+    font-size:13px;color:var(--ink-soft)}
+  footer .tools{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+  footer p{margin:6px 0}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <p class="kicker">Vente de particulier à particulier</p>
+    <h1>Menez votre vente jusqu'au notaire, sans agence.</h1>
+    <p>Un fil conducteur pour rassembler les bons documents, publier une annonce conforme et transmettre un dossier complet à l'étude. Vous restez maître de chaque décision.</p>
+    <span class="save"><span class="dot"></span><span id="saveState">Dossier enregistré sur cet appareil</span></span>
+  </header>
+
+  <nav class="steps" id="stepper" aria-label="Étapes de la vente"></nav>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-step="1" aria-labelledby="t1">
+    <p class="eyebrow">Étape 1 sur 6</p>
+    <h2 id="t1">Identifier le bien &amp; ses diagnostics</h2>
+    <p class="lead">On situe précisément le bien, puis on en déduit la liste légale des diagnostics à réaliser avant la mise en vente.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Adresse du bien</h3>
+        <div class="field">
+          <label class="f" for="q">Rechercher une adresse</label>
+          <input type="text" id="q" autocomplete="off" placeholder="12 rue des Écoles, Douarnenez…">
+          <p class="hint" id="addrState">Source : Base Adresse Nationale (service public, gratuit).</p>
+          <div class="results" id="results"></div>
+        </div>
+        <div id="officialLinks" style="display:none">
+          <p class="hint" style="margin-top:14px"><strong>Outils officiels pour cette commune :</strong></p>
+          <div class="links">
+            <a href="https://app.dvf.etalab.gouv.fr/" target="_blank" rel="noopener">Prix de vente réels autour du bien (DVF) ↗</a>
+            <a href="https://www.cadastre.gouv.fr/" target="_blank" rel="noopener">Repérer la parcelle sur le cadastre ↗</a>
+            <a href="https://www.georisques.gouv.fr/" target="_blank" rel="noopener">Générer l'état des risques (Géorisques / ERRIAL) ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Caractéristiques</h3>
+        <div class="field">
+          <label class="f" for="ptype">Type de bien</label>
+          <select id="ptype" data-field="property_type">
+            <option>Maison</option><option>Appartement</option><option>Terrain</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="f" for="year">Année de construction</label>
+          <input type="number" id="year" data-field="build_year" min="1700" max="2026">
+        </div>
+        <div class="field">
+          <label class="f" for="surface">Surface habitable (m²)</label>
+          <input type="number" id="surface" data-field="surface" min="1">
+        </div>
+        <div class="field">
+          <label class="f" for="dpe">Classe DPE (si vous la connaissez déjà)</label>
+          <select id="dpe" data-field="dpe_rating">
+            <option value="">Je ne sais pas encore</option>
+            <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option>
+          </select>
+        </div>
+        <label class="check"><input type="checkbox" data-field="is_condo"><span>Le bien est en copropriété</span></label>
+        <label class="check"><input type="checkbox" data-field="elec_over_15"><span>Installation électrique de plus de 15 ans</span></label>
+        <label class="check"><input type="checkbox" data-field="has_gas"><span>Présence d'une installation au gaz</span></label>
+        <label class="check" id="gasAgeRow" style="display:none"><input type="checkbox" data-field="gas_over_15"><span>Installation de gaz de plus de 15 ans</span></label>
+        <label class="check"><input type="checkbox" data-field="zone_termites"><span>Bien situé en zone à risque termites <small>(défini par arrêté préfectoral — vérifiable en mairie ou sur Géorisques)</small></span></label>
+        <label class="check"><input type="checkbox" data-field="assainissement_nc"><span>Assainissement non collectif <small>(fosse / non raccordé au tout-à-l'égout)</small></span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Diagnostics obligatoires pour votre bien</h3>
+      <p class="hint" style="margin-top:-6px;margin-bottom:12px">Cochez ceux que vous avez déjà fait réaliser. La liste s'ajuste à vos réponses ci-dessus.</p>
+      <div id="diagList"></div>
+      <div id="auditHint"></div>
+      <p class="hint" style="margin-top:14px">Annuaire officiel des diagnostiqueurs certifiés : <a href="https://diagnostiqueurs.din.developpement-durable.gouv.fr/" target="_blank" rel="noopener">ministère de la Transition écologique ↗</a></p>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-step="2" aria-labelledby="t2">
+    <p class="eyebrow">Étape 2 sur 6</p>
+    <h2 id="t2">Rassembler le dossier juridique</h2>
+    <p class="lead">Ces pièces prouvent que vous pouvez vendre et évitent les mauvaises surprises à la signature.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>Documents de propriété</h3>
+        <div id="docsGeneral"></div>
+      </div>
+      <div class="card">
+        <h3>Copropriété</h3>
+        <div id="docsCondo"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-step="3" aria-labelledby="t3">
+    <p class="eyebrow">Étape 3 sur 6</p>
+    <h2 id="t3">Rédiger l'annonce</h2>
+    <p class="lead">On génère un texte prêt à copier, avec les mentions légales d'affichage (DPE, risques) déjà intégrées.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>Paramètres</h3>
+        <div class="field"><label class="f" for="price">Prix de vente affiché (€)</label><input type="number" id="price" data-field="price_target" step="1000"></div>
+        <div class="field"><label class="f" for="rooms">Nombre de pièces</label><input type="number" id="rooms" data-field="rooms" min="1"></div>
+        <div class="field"><label class="f" for="ges">Classe climat (GES)</label>
+          <select id="ges" data-field="ges_rating">
+            <option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option>
+          </select></div>
+        <div class="grid2">
+          <div class="field"><label class="f" for="emin">Énergie estimée min (€/an)</label><input type="number" id="emin" data-field="energy_cost_min"></div>
+          <div class="field"><label class="f" for="emax">Énergie estimée max (€/an)</label><input type="number" id="emax" data-field="energy_cost_max"></div>
+        </div>
+        <div class="field"><label class="f" for="desc">Points forts (votre description)</label><textarea id="desc" data-field="description_extra"></textarea></div>
+      </div>
+      <div class="card">
+        <h3>Annonce générée</h3>
+        <div class="annonce" id="annonce"></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn mini" id="copyBtn">Copier le texte</button>
+          <span class="hint" id="copyState"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="panel" data-step="4" aria-labelledby="t4">
+    <p class="eyebrow">Étape 4 sur 6</p>
+    <h2 id="t4">Qualifier les visiteurs</h2>
+    <p class="lead">Avant de bloquer votre bien pour un acheteur, vérifiez qu'il est sérieux et solvable.</p>
+    <div class="card">
+      <h3>Grille de vérification</h3>
+      <div id="qualifList"></div>
+    </div>
+    <div class="note alert"><strong>Sécurité :</strong> ne signez jamais une offre d'achat sans avoir vu une attestation de faisabilité financière récente, rédigée par la banque de l'acheteur ou son courtier.</div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="panel" data-step="5" aria-labelledby="t5">
+    <p class="eyebrow">Étape 5 sur 6</p>
+    <h2 id="t5">Formaliser l'offre d'achat</h2>
+    <p class="lead">On enregistre la proposition et on vérifie que le financement tient la route.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>L'offre reçue</h3>
+        <div class="field"><label class="f" for="oprice">Prix proposé (€)</label><input type="number" id="oprice" data-offer="price" step="1000"></div>
+        <div class="field"><label class="f" for="oapport">Apport personnel (€)</label><input type="number" id="oapport" data-offer="apport" step="1000"></div>
+        <div class="field"><label class="f" for="oloan">Prêt sollicité (€)</label><input type="number" id="oloan" data-offer="loan" step="1000"></div>
+        <label class="check"><input type="checkbox" data-offer="bank_ok"><span>Attestation de faisabilité fournie</span></label>
+        <div class="field" style="margin-top:14px"><label class="f" for="ostatus">Statut de la négociation</label>
+          <select id="ostatus" data-offer="status">
+            <option>Aucune</option><option>Offre reçue (en réflexion)</option><option>Contre-proposition envoyée</option><option>Offre acceptée</option><option>Offre refusée</option>
+          </select></div>
+      </div>
+      <div class="card">
+        <h3>Analyse</h3>
+        <div id="offerAnalysis"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="panel" data-step="6" aria-labelledby="t6">
+    <p class="eyebrow">Étape 6 sur 6</p>
+    <h2 id="t6">Transmettre au notaire</h2>
+    <p class="lead">Votre rôle s'arrête ici : le notaire rédige l'avant-contrat. Voici les pièces à lui envoyer.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>Pièces à transmettre</h3>
+        <div id="notaireList"></div>
+      </div>
+      <div class="card">
+        <h3>Après la signature</h3>
+        <div class="note"><strong>Délai de rétractation (SRU) :</strong> l'acheteur dispose de 10 jours calendaires pour se rétracter, sans motif.</div>
+        <div class="note" style="margin-top:12px"><strong>Condition suspensive de prêt :</strong> l'acheteur a en général 45 à 60 jours pour obtenir son accord de prêt définitif.</div>
+        <div class="note warn" style="margin-top:12px">Le compromis se signe à l'étude. Ne le rédigez pas vous-même : c'est le rôle du notaire, et cela ne vous coûte rien de plus.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="navflow">
+    <button class="btn ghost" id="prevBtn">← Étape précédente</button>
+    <button class="btn" id="nextBtn">Étape suivante →</button>
+  </div>
+
+  <footer>
+    <div class="tools">
+      <button class="btn ghost mini" id="exportBtn">Sauvegarder le dossier (.json)</button>
+      <button class="btn ghost mini" id="importBtn">Restaurer un dossier</button>
+      <button class="btn ghost mini" id="resetBtn">Tout effacer</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none">
+    </div>
+    <p>Outil libre et gratuit. <strong>Aucune donnée n'est envoyée</strong> : tout reste sur votre appareil. La sauvegarde <code>.json</code> sert à transférer votre dossier sur un autre appareil.</p>
+    <p>Ce guide informe et organise ; il ne remplace pas le notaire, seul compétent pour l'avant-contrat. Les obligations légales peuvent évoluer — vérifiez les points sensibles auprès de votre étude.</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const KEY="dossier_vente_ppp_v1";
+let _mem=null;
+const store={
+  get(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}catch(e){return _mem;}},
+  set(v){_mem=v;try{localStorage.setItem(KEY,JSON.stringify(v));}catch(e){}}
+};
+const DEFAULT={
+  step:1,address:"",city:"",postcode:"",citycode:"",lat:null,lon:null,
+  property_type:"Maison",build_year:1990,surface:85,rooms:4,
+  is_condo:false,elec_over_15:true,has_gas:false,gas_over_15:false,
+  zone_termites:false,assainissement_nc:false,
+  dpe_rating:"",ges_rating:"",energy_cost_min:900,energy_cost_max:1300,
+  price_target:255000,
+  description_extra:"Maison lumineuse avec jardin au calme, proche des écoles.",
+  diagnostics_done:[],docs:{},qualif:{},notaire:{},
+  offer:{price:0,apport:0,loan:0,bank_ok:false,status:"Aucune"}
+};
+let s=Object.assign({},DEFAULT,store.get()||{});
+s.offer=Object.assign({},DEFAULT.offer,s.offer||{});
+function save(){store.set(s);flash();}
+let flashT;
+function flash(){const el=document.getElementById("saveState");el.textContent="Enregistré ✓";
+  clearTimeout(flashT);flashT=setTimeout(()=>el.textContent="Dossier enregistré sur cet appareil",1200);}
+const eur=n=>(Number(n)||0).toLocaleString("fr-FR")+" €";
+
+const STEPS=[
+  {n:1,label:"Bien & diagnostics"},{n:2,label:"Dossier juridique"},{n:3,label:"Annonce"},
+  {n:4,label:"Visiteurs"},{n:5,label:"Offre d'achat"},{n:6,label:"Notaire"}
+];
+const DOCS_GENERAL=["Titre de propriété (acte d'achat complet)","Dernier avis de taxe foncière",
+  "Factures et garanties des travaux réalisés","Autorisations d'urbanisme (permis, déclaration préalable)"];
+const DOCS_CONDO=["Procès-verbaux des 3 dernières assemblées générales","Règlement de copropriété et état descriptif de division",
+  "Fiche synthétique de la copropriété","Carnet d'entretien de l'immeuble","Pré-état daté (à demander au syndic)"];
+const QUALIF=["A visité le bien en personne","A consulté le dossier complet des diagnostics",
+  "A précisé son financement (apport / prêt)","Dispose d'une attestation de faisabilité bancaire",
+  "N'a pas de bien à vendre au préalable (pas de vente en cascade)","A fixé une date de décision"];
+const NOTAIRE=["Pièce d'identité valide du ou des vendeurs","Livret de famille ou acte de naissance",
+  "Coordonnées du notaire de l'acheteur (le cas échéant)","Titre de propriété complet",
+  "Dossier de diagnostics techniques complet","Offre d'achat signée par les deux parties"];
+
+function requiredDiagnostics(){
+  const r=[{k:"dpe",l:"DPE — diagnostic de performance énergétique"},
+          {k:"erp",l:"État des risques (à générer sur Géorisques / ERRIAL)"}];
+  if(s.build_year<1997)r.push({k:"amiante",l:"Amiante — construction avant le 01/07/1997"});
+  if(s.build_year<1949)r.push({k:"plomb",l:"CREP plomb — construction avant le 01/01/1949"});
+  if(s.elec_over_15)r.push({k:"elec",l:"Électricité — installation de plus de 15 ans"});
+  if(s.has_gas&&s.gas_over_15)r.push({k:"gaz",l:"Gaz — installation de plus de 15 ans"});
+  if(s.is_condo&&s.property_type==="Appartement")r.push({k:"carrez",l:"Loi Carrez — surface privative (copropriété)"});
+  if(s.property_type==="Maison"&&!s.is_condo&&["E","F","G"].includes(s.dpe_rating))
+    r.push({k:"audit",l:"Audit énergétique réglementaire — maison classée "+s.dpe_rating+" (à remettre dès la 1ʳᵉ visite)"});
+  if(s.zone_termites)r.push({k:"termites",l:"Termites — zone à risque (arrêté préfectoral)"});
+  if(s.assainissement_nc)r.push({k:"anc",l:"Assainissement non collectif — contrôle SPANC de moins de 3 ans"});
+  return r;
+}
+
+/* ---------- rendering ---------- */
+function renderStepper(){
+  const nav=document.getElementById("stepper");nav.innerHTML="";
+  STEPS.forEach(st=>{
+    const b=document.createElement("button");
+    b.className="tab"+(stepComplete(st.n)?" done":"");
+    b.setAttribute("aria-current",s.step===st.n?"true":"false");
+    b.innerHTML='<span class="num"><span>'+st.n+'</span></span>'+st.label;
+    b.onclick=()=>goto(st.n);
+    nav.appendChild(b);
+  });
+}
+function stepComplete(n){
+  if(n===1){const req=requiredDiagnostics();return req.length>0&&req.every(d=>s.diagnostics_done.includes(d.k));}
+  if(n===2)return DOCS_GENERAL.some(d=>s.docs[d]);
+  if(n===3)return (s.description_extra||"").trim().length>0&&s.dpe_rating!=="";
+  if(n===4)return QUALIF.every(q=>s.qualif[q]);
+  if(n===5)return s.offer.status==="Offre acceptée";
+  if(n===6)return NOTAIRE.every(x=>s.notaire[x]);
+  return false;
+}
+function renderDiag(){
+  const box=document.getElementById("diagList");box.innerHTML="";
+  requiredDiagnostics().forEach(d=>{
+    const done=s.diagnostics_done.includes(d.k);
+    const lab=document.createElement("label");lab.className="check";
+    lab.innerHTML='<input type="checkbox"'+(done?" checked":"")+'><span>'+d.l+
+      ' <span class="pill '+(done?"ok":"req")+'">'+(done?"fait":"à faire")+'</span></span>';
+    lab.querySelector("input").onchange=e=>{
+      if(e.target.checked){if(!s.diagnostics_done.includes(d.k))s.diagnostics_done.push(d.k);}
+      else s.diagnostics_done=s.diagnostics_done.filter(x=>x!==d.k);
+      save();renderDiag();renderStepper();
+    };
+    box.appendChild(lab);
+  });
+  const h=document.getElementById("auditHint");
+  if(s.property_type==="Maison"&&!s.is_condo&&s.dpe_rating===""){
+    h.innerHTML='<div class="note warn">Si votre maison est classée <strong>E, F ou G</strong>, un <strong>audit énergétique</strong> sera obligatoire, en plus du DPE. Renseignez la classe DPE ci-dessus pour l\'ajouter automatiquement.</div>';
+  }else h.innerHTML="";
+}
+function renderCheckList(elId,items,storeObj,after){
+  const box=document.getElementById(elId);box.innerHTML="";
+  items.forEach(it=>{
+    const lab=document.createElement("label");lab.className="check";
+    lab.innerHTML='<input type="checkbox"'+(storeObj[it]?" checked":"")+'><span>'+it+'</span>';
+    lab.querySelector("input").onchange=e=>{storeObj[it]=e.target.checked;save();renderStepper();if(after)after();};
+    box.appendChild(lab);
+  });
+}
+function renderDocs(){
+  renderCheckList("docsGeneral",DOCS_GENERAL,s.docs);
+  const condo=document.getElementById("docsCondo");
+  if(!s.is_condo){condo.innerHTML='<p class="hint">Bien non déclaré en copropriété (modifiable à l\'étape 1).</p>';}
+  else renderCheckList("docsCondo",DOCS_CONDO,s.docs);
+}
+function renderAnnonce(){
+  const c=s.is_condo?"Bien soumis au statut de la copropriété.":"Pleine propriété (hors copropriété).";
+  const dpe=s.dpe_rating||"—",ges=s.ges_rating||"—";
+  let auditLine="";
+  if(s.property_type==="Maison"&&!s.is_condo&&["E","F","G"].includes(s.dpe_rating))
+    auditLine="\n- Logement à consommation énergétique excessive : audit énergétique réglementaire disponible.";
+  const t=
+"Vente de particulier à particulier : "+s.property_type+" "+s.rooms+" pièces – "+s.surface+" m²\n\n"+
+"À vendre à "+(s.city||"[ville]")+" : "+s.property_type.toLowerCase()+" de "+s.surface+" m² habitables, "+s.rooms+" pièces principales.\n\n"+
+"Description :\n"+(s.description_extra||"")+"\n\n"+
+"Informations :\n"+
+"- Prix de vente : "+eur(s.price_target)+" (sans frais d'agence)\n"+
+"- Surface : "+s.surface+" m²\n"+
+"- Année de construction : "+s.build_year+"\n"+
+"- Statut : "+c+"\n\n"+
+"Mentions légales (DPE) :\n"+
+"- Classe énergie : "+dpe+" | Classe climat : "+ges+"\n"+
+"- Dépenses annuelles d'énergie estimées (usage standard) : entre "+eur(s.energy_cost_min)+" et "+eur(s.energy_cost_max)+" par an."+auditLine+"\n"+
+"- Risques auxquels ce bien est exposé : www.georisques.gouv.fr\n\n"+
+"Premier contact par message ou téléphone. Agences s'abstenir, merci.";
+  document.getElementById("annonce").textContent=t;
+}
+function renderOffer(){
+  const o=s.offer,box=document.getElementById("offerAnalysis");
+  const total=(Number(o.apport)||0)+(Number(o.loan)||0);
+  const diff=(Number(o.price)||0)-(Number(s.price_target)||0);
+  let html="";
+  html+='<div class="metric"><span class="lab">Prix affiché</span><span class="val">'+eur(s.price_target)+'</span></div>';
+  html+='<div class="metric"><span class="lab">Prix proposé</span><span class="val">'+eur(o.price)+
+        ' <span class="delta '+(diff>=0?"pos":"neg")+'" style="font-size:13px">'+(diff>=0?"+":"")+eur(diff)+'</span></span></div>';
+  html+='<div class="metric"><span class="lab">Financement réuni</span><span class="val">'+eur(total)+'</span></div>';
+  if((Number(o.price)||0)>0&&total<(Number(o.price)||0))
+    html+='<div class="note alert">Montage incomplet : apport + prêt ('+eur(total)+') est inférieur au prix proposé.</div>';
+  else if((Number(o.price)||0)>0)
+    html+='<div class="note">Le financement couvre l\'intégralité du prix proposé.</div>';
+  if(!o.bank_ok&&(Number(o.price)||0)>0)
+    html+='<div class="note warn">Attestation de faisabilité non fournie : demandez-la avant d\'accepter.</div>';
+  if(o.status==="Offre acceptée")
+    html+='<div class="note"><strong>Offre acceptée.</strong> Rassemblez le dossier (étape 6) et prenez rendez-vous à l\'étude notariale.</div>';
+  box.innerHTML=html;
+}
+
+/* ---------- navigation ---------- */
+function showPanel(){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",+p.dataset.step===s.step));
+  document.getElementById("prevBtn").style.visibility=s.step>1?"visible":"hidden";
+  document.getElementById("nextBtn").style.visibility=s.step<6?"visible":"hidden";
+}
+function goto(n){s.step=Math.max(1,Math.min(6,n));save();showPanel();renderStepper();window.scrollTo({top:0,behavior:"smooth"});}
+document.getElementById("prevBtn").onclick=()=>goto(s.step-1);
+document.getElementById("nextBtn").onclick=()=>goto(s.step+1);
+
+/* ---------- generic field binding ---------- */
+function hydrate(){
+  document.querySelectorAll("[data-field]").forEach(el=>{
+    const f=el.dataset.field;
+    if(el.type==="checkbox")el.checked=!!s[f];else el.value=s[f];
+  });
+  document.querySelectorAll("[data-offer]").forEach(el=>{
+    const f=el.dataset.offer;
+    if(el.type==="checkbox")el.checked=!!s.offer[f];else el.value=s.offer[f];
+  });
+  document.getElementById("gasAgeRow").style.display=s.has_gas?"flex":"none";
+}
+document.querySelectorAll("[data-field]").forEach(el=>{
+  const ev=(el.tagName==="SELECT"||el.type==="checkbox")?"change":"input";
+  el.addEventListener(ev,()=>{
+    const f=el.dataset.field;
+    s[f]=el.type==="checkbox"?el.checked:(el.type==="number"?(el.value===""?0:+el.value):el.value);
+    if(f==="has_gas")document.getElementById("gasAgeRow").style.display=s.has_gas?"flex":"none";
+    save();
+    if(["property_type","build_year","is_condo","elec_over_15","has_gas","gas_over_15","zone_termites","assainissement_nc","dpe_rating"].includes(f)){renderDiag();}
+    if(f==="is_condo")renderDocs();
+    renderAnnonce();renderStepper();
+  });
+});
+document.querySelectorAll("[data-offer]").forEach(el=>{
+  const ev=(el.tagName==="SELECT"||el.type==="checkbox")?"change":"input";
+  el.addEventListener(ev,()=>{
+    const f=el.dataset.offer;
+    s.offer[f]=el.type==="checkbox"?el.checked:(el.type==="number"?(el.value===""?0:+el.value):el.value);
+    save();renderOffer();renderStepper();
+  });
+});
+
+/* ---------- address search (BAN) ---------- */
+let debT;
+const qEl=document.getElementById("q");
+qEl.value=s.address||"";
+if(s.city)document.getElementById("officialLinks").style.display="block";
+qEl.addEventListener("input",()=>{
+  const v=qEl.value.trim();clearTimeout(debT);
+  if(v.length<3){document.getElementById("results").innerHTML="";return;}
+  debT=setTimeout(()=>searchAddress(v),300);
+});
+async function searchAddress(q){
+  const box=document.getElementById("results");
+  try{
+    const r=await fetch("https://api-adresse.data.gouv.fr/search/?limit=5&q="+encodeURIComponent(q));
+    const j=await r.json();const feats=j.features||[];
+    box.innerHTML="";
+    feats.forEach(ft=>{
+      const d=document.createElement("div");d.className="res-item";
+      d.textContent=ft.properties.label;
+      d.onclick=()=>selectAddress(ft);
+      box.appendChild(d);
+    });
+  }catch(e){box.innerHTML='<p class="hint">Recherche indisponible pour le moment.</p>';}
+}
+function selectAddress(ft){
+  const p=ft.properties,g=ft.geometry.coordinates;
+  s.address=p.label;s.city=p.city;s.postcode=p.postcode;s.citycode=p.citycode;
+  s.lon=g[0];s.lat=g[1];save();
+  qEl.value=p.label;document.getElementById("results").innerHTML="";
+  document.getElementById("addrState").innerHTML="Bien localisé à <strong>"+p.city+" ("+p.postcode+")</strong>.";
+  document.getElementById("officialLinks").style.display="block";
+}
+
+/* ---------- annonce copy ---------- */
+document.getElementById("copyBtn").onclick=async()=>{
+  const txt=document.getElementById("annonce").textContent;
+  const st=document.getElementById("copyState");
+  try{await navigator.clipboard.writeText(txt);st.textContent="Copié ✓";}
+  catch(e){st.textContent="Sélectionnez puis copiez le texte.";}
+  setTimeout(()=>st.textContent="",1800);
+};
+
+/* ---------- export / import / reset ---------- */
+document.getElementById("exportBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify(s,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="dossier-vente.json";a.click();URL.revokeObjectURL(a.href);
+};
+document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
+document.getElementById("importFile").onchange=e=>{
+  const file=e.target.files[0];if(!file)return;
+  const rd=new FileReader();
+  rd.onload=()=>{try{s=Object.assign({},DEFAULT,JSON.parse(rd.result));
+    s.offer=Object.assign({},DEFAULT.offer,s.offer||{});save();renderAll();}
+    catch(err){alert("Fichier JSON invalide.");}};
+  rd.readAsText(file);
+};
+document.getElementById("resetBtn").onclick=()=>{
+  if(confirm("Effacer tout le dossier ? Cette action est irréversible."))
+    {s=Object.assign({},DEFAULT);s.offer=Object.assign({},DEFAULT.offer);save();renderAll();}
+};
+
+/* ---------- boot ---------- */
+function renderAll(){hydrate();renderStepper();renderDiag();renderDocs();renderAnnonce();renderOffer();showPanel();qEl.value=s.address||"";}
+renderAll();
+</script>
+</body>
+</html>
