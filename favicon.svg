@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="De gré à gré">
+  <rect width="32" height="32" rx="7" fill="#1E6B52"/>
+  <polygon points="16,5 26.5,15 5.5,15" fill="#F1EFE9"/>
+  <rect x="9" y="15" width="14" height="10" fill="#F1EFE9"/>
+  <circle cx="16" cy="18.4" r="2.1" fill="#1E6B52"/>
+  <polygon points="14.4,20 17.6,20 18.4,24.6 13.6,24.6" fill="#1E6B52"/>
+</svg>
