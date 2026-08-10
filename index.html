@@ -594,7 +594,10 @@ document.getElementById("resetBtn").onclick=()=>{
 };
 
 /* ---------- boot ---------- */
-function renderAll(){hydrate();renderStepper();renderDiag();renderDocs();renderAnnonce();renderOffer();showPanel();qEl.value=s.address||"";}
+function renderAll(){hydrate();renderStepper();renderDiag();renderDocs();
+  renderCheckList("qualifList",QUALIF,s.qualif);
+  renderCheckList("notaireList",NOTAIRE,s.notaire);
+  renderAnnonce();renderOffer();showPanel();qEl.value=s.address||"";}
 renderAll();
 </script>
 </body>
