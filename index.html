@@ -312,6 +312,13 @@
     max-width:64ch}
   details.qa .qa-body a{color:var(--pine-ink)}
   .faq .qa-foot{font-size:13px;color:var(--ink-soft);margin:16px 0 0}
+
+  /* ===== VALIDITÉ DIAGNOSTICS ===== */
+  .diag-valid{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    margin:0 0 11px 27px;font-size:13px}
+  .diag-valid .diag-lab{font-size:12.5px;color:var(--ink-soft)}
+  .diag-valid input[type=date]{width:auto;padding:5px 9px;font-size:13px}
+  .diag-note{font-size:12.5px;color:var(--ink-soft)}
 </style>
 </head>
 <body>
@@ -416,6 +423,7 @@
       <p class="hint" style="margin-top:-6px;margin-bottom:12px">Cochez ceux que vous avez déjà fait réaliser. La liste s'ajuste à vos réponses ci-dessus.</p>
       <div id="diagList"></div>
       <div id="auditHint"></div>
+      <div id="diagValidityNote"></div>
       <p class="hint" style="margin-top:14px">Annuaire officiel des diagnostiqueurs certifiés : <a href="https://diagnostiqueurs.din.developpement-durable.gouv.fr/" target="_blank" rel="noopener">ministère de la Transition écologique ↗</a></p>
     </div>
   </section>
@@ -519,6 +527,9 @@
       <div class="note" style="margin-top:16px">
         <strong>À garder sous la main pendant la visite :</strong> le dossier de diagnostics complet (à remettre dès la première visite pour une maison classée E, F ou G), le titre de propriété et le dernier avis de taxe foncière. Notez le retour de chaque visiteur juste après son départ, tant que l'impression est fraîche.
       </div>
+      <div class="note alert" style="margin-top:12px">
+        <strong>Vigilance :</strong> côté fraude, méfiez-vous des « acheteurs » pressés qui refusent la visite, des attestations bancaires douteuses (vérifiez-les auprès de la banque) et de toute demande de virement ou de pièces avant le notaire — l'argent ne transite jamais entre vous, seulement par l'étude. Côté sécurité, évitez d'être seul lors des visites et notez l'identité de qui entre chez vous.
+      </div>
     </div>
 
     <div class="card">
@@ -551,6 +562,17 @@
         <div id="offerAnalysis"></div>
       </div>
     </div>
+
+    <div class="card">
+      <h3>Net vendeur estimé</h3>
+      <p class="hint" style="margin-top:-6px;margin-bottom:14px">Ce que vous touchez réellement, une fois le prêt en cours soldé et les frais déduits. Estimation indicative.</p>
+      <div class="grid2">
+        <div class="field" style="margin:0"><label class="f" for="crd">Capital restant dû de votre prêt (€)</label><input type="number" id="crd" data-field="loan_remaining" step="1000"></div>
+        <div class="field" style="margin:0"><label class="f" for="dcost">Coût des diagnostics (€)</label><input type="number" id="dcost" data-field="diag_cost" step="10"></div>
+      </div>
+      <label class="check" style="margin-top:12px"><input type="checkbox" data-field="is_secondary"><span>Résidence secondaire ou investissement <small>(une plus-value peut s'appliquer)</small></span></label>
+      <div id="netAnalysis" style="margin-top:14px"></div>
+    </div>
   </section>
 
   <!-- STEP 6 -->
@@ -573,6 +595,13 @@
         </div>
         <div class="note warn" style="margin-top:12px">Le compromis se signe à l'étude. Ne le rédigez pas vous-même : c'est le rôle du notaire, et cela ne vous coûte rien de plus.</div>
       </div>
+    </div>
+
+    <div class="card">
+      <h3>Rétroplanning</h3>
+      <p class="hint" style="margin-top:-6px;margin-bottom:14px">À partir de la date de signature du compromis, les échéances clés se calculent automatiquement. Dates indicatives, à confirmer avec l'étude.</p>
+      <div class="field" style="max-width:280px;margin:0"><label class="f" for="compromisDate">Date de signature du compromis</label><input type="date" id="compromisDate" data-field="compromis_date"></div>
+      <div id="planList" style="margin-top:14px"></div>
     </div>
 
     <!-- Export PDF -->
@@ -686,12 +715,14 @@ const DEFAULT={
   description_extra:"Maison lumineuse avec jardin au calme, proche des écoles.",
   honest_strong:"",honest_watch:"",
   diagnostics_done:[],docs:{},qualif:{},notaire:{},visits:[],shots:{},
+  diag_dates:{},compromis_date:"",loan_remaining:0,diag_cost:0,is_secondary:false,
   offer:{price:0,apport:0,loan:0,bank_ok:false,status:"Aucune"}
 };
 let s=Object.assign({},DEFAULT,store.get()||{});
 s.offer=Object.assign({},DEFAULT.offer,s.offer||{});
 s.visits=Array.isArray(s.visits)?s.visits.slice():[];
 s.shots=Object.assign({},s.shots||{});
+s.diag_dates=Object.assign({},s.diag_dates||{});
 function save(){store.set(s);flash();}
 let flashT;
 function flash(){const el=document.getElementById("saveState");el.textContent="Enregistré ✓";
@@ -760,6 +791,10 @@ function stepComplete(n){
   if(n===6)return NOTAIRE.every(x=>s.notaire[x]);
   return false;
 }
+const DIAG_MONTHS={dpe:120,erp:6,elec:36,gaz:36,audit:60,termites:6,anc:36};
+const DIAG_UNLIMITED={amiante:"Illimité si absence constatée.",plomb:"1 an si présence de plomb, sinon illimité.",carrez:"Sans limite, sauf travaux modifiant la surface."};
+function fmtDateFR(d){const x=(d instanceof Date)?d:new Date(d);return isNaN(x)?"":x.toLocaleDateString("fr-FR");}
+function addMonths(dateStr,m){const x=new Date(dateStr);if(isNaN(x))return null;x.setMonth(x.getMonth()+m);return x;}
 function renderDiag(){
   const box=document.getElementById("diagList");box.innerHTML="";
   requiredDiagnostics().forEach(d=>{
@@ -773,11 +808,41 @@ function renderDiag(){
       save();renderDiag();renderStepper();
     };
     box.appendChild(lab);
+    if(done){
+      const row=document.createElement("div");row.className="diag-valid";
+      const unl=DIAG_UNLIMITED[d.k];
+      if(unl){
+        row.innerHTML='<span class="pill ok">durée</span> <span class="diag-note">'+unl+'</span>';
+      }else if(DIAG_MONTHS[d.k]){
+        const cur=s.diag_dates[d.k]||"";
+        let status='<span class="diag-note">Renseignez la date pour suivre la validité.</span>';
+        if(cur){
+          const exp=addMonths(cur,DIAG_MONTHS[d.k]);
+          if(exp){
+            const now=new Date();now.setHours(0,0,0,0);
+            const soon=new Date(now);soon.setDate(soon.getDate()+60);
+            let cls="ok",txt="Valide jusqu'au "+fmtDateFR(exp);
+            if(exp<now){cls="out";txt="Expiré depuis le "+fmtDateFR(exp);}
+            else if(exp<soon){cls="req";txt="Expire bientôt ("+fmtDateFR(exp)+")";}
+            status='<span class="pill '+cls+'">'+txt+'</span>';
+          }
+        }
+        row.innerHTML='<span class="diag-lab">Réalisé le</span><input type="date" class="diag-date"> '+status;
+        const di=row.querySelector(".diag-date");
+        di.value=cur;
+        di.addEventListener("change",e=>{s.diag_dates[d.k]=e.target.value;save();renderDiag();});
+      }
+      box.appendChild(row);
+    }
   });
   const h=document.getElementById("auditHint");
   if(s.property_type==="Maison"&&!s.is_condo&&s.dpe_rating===""){
     h.innerHTML='<div class="note warn">Si votre maison est classée <strong>E, F ou G</strong>, un <strong>audit énergétique</strong> sera obligatoire, en plus du DPE. Renseignez la classe DPE ci-dessus pour l\'ajouter automatiquement.</div>';
   }else h.innerHTML="";
+  const rem=document.getElementById("diagValidityNote");
+  if(rem)rem.innerHTML= s.diagnostics_done.length
+    ? '<div class="note">La validité s\'apprécie au <strong>jour de la signature de l\'acte authentique</strong>, pas au compromis. Un diagnostic court (ERP, termites : 6 mois) peut expirer entre les deux et devra être refait avant l\'étude.</div>'
+    : '';
 }
 function renderCheckList(elId,items,storeObj,after){
   const box=document.getElementById(elId);box.innerHTML="";
@@ -797,9 +862,9 @@ function renderDocs(){
 function renderAnnonce(){
   const c=s.is_condo?"Bien soumis au statut de la copropriété.":"Pleine propriété (hors copropriété).";
   const dpe=s.dpe_rating||"—",ges=s.ges_rating||"—";
-  let auditLine="";
-  if(s.property_type==="Maison"&&!s.is_condo&&["E","F","G"].includes(s.dpe_rating))
-    auditLine="\n- Logement à consommation énergétique excessive : audit énergétique réglementaire disponible.";
+  let energyMention="";
+  if(["F","G"].includes(s.dpe_rating))
+    energyMention="\n- Logement à consommation énergétique excessive : classe "+s.dpe_rating+".";
   const t=
 "Vente de particulier à particulier : "+s.property_type+" "+s.rooms+" pièces – "+s.surface+" m²\n\n"+
 "À vendre à "+(s.city||"[ville]")+" : "+s.property_type.toLowerCase()+" de "+s.surface+" m² habitables, "+s.rooms+" pièces principales.\n\n"+
@@ -811,7 +876,7 @@ function renderAnnonce(){
 "- Statut : "+c+"\n\n"+
 "Mentions légales (DPE) :\n"+
 "- Classe énergie : "+dpe+" | Classe climat : "+ges+"\n"+
-"- Dépenses annuelles d'énergie estimées (usage standard) : entre "+eur(s.energy_cost_min)+" et "+eur(s.energy_cost_max)+" par an."+auditLine+"\n"+
+"- Dépenses annuelles d'énergie estimées (usage standard) : entre "+eur(s.energy_cost_min)+" et "+eur(s.energy_cost_max)+" par an."+energyMention+"\n"+
 "- Risques auxquels ce bien est exposé : www.georisques.gouv.fr\n\n"+
 "Premier contact par message ou téléphone. Agences s'abstenir, merci.";
   document.getElementById("annonce").textContent=t;
@@ -837,6 +902,35 @@ function renderOffer(){
   box.innerHTML=html;
 }
 
+function renderNet(){
+  const box=document.getElementById("netAnalysis");if(!box)return;
+  const price=(Number(s.offer.price)||0)>0?Number(s.offer.price):(Number(s.price_target)||0);
+  const crd=Number(s.loan_remaining)||0;
+  const dc=Number(s.diag_cost)||0;
+  const net=price-crd-dc;
+  let html="";
+  html+='<div class="metric"><span class="lab">Prix retenu</span><span class="val">'+eur(price)+'</span></div>';
+  if(crd>0)html+='<div class="metric"><span class="lab">− Capital restant dû</span><span class="val">'+eur(crd)+'</span></div>';
+  if(dc>0)html+='<div class="metric"><span class="lab">− Diagnostics</span><span class="val">'+eur(dc)+'</span></div>';
+  html+='<div class="metric"><span class="lab"><strong>Net vendeur estimé</strong></span><span class="val '+(net>=0?"delta pos":"delta neg")+'">'+eur(net)+'</span></div>';
+  if(s.is_secondary)
+    html+='<div class="note warn">Résidence secondaire : une <strong>plus-value</strong> peut réduire ce net, avec des abattements selon la durée de détention. Le notaire la calcule et la prélève — anticipez la question avec lui.</div>';
+  html+='<div class="note">Estimation hors frais éventuels (mainlevée d\'hypothèque, indemnité de remboursement anticipé du prêt). Votre banque et le notaire donnent les montants exacts.</div>';
+  box.innerHTML=html;
+}
+function renderPlan(){
+  const box=document.getElementById("planList");if(!box)return;
+  const bd=new Date(s.compromis_date);
+  if(!s.compromis_date||isNaN(bd)){box.innerHTML='<p class="hint">Renseignez la date du compromis pour afficher les échéances.</p>';return;}
+  const plus=days=>{const x=new Date(bd);x.setDate(x.getDate()+days);return fmtDateFR(x);};
+  let html="";
+  html+='<div class="metric"><span class="lab">Signature du compromis</span><span class="val">'+fmtDateFR(bd)+'</span></div>';
+  html+='<div class="metric"><span class="lab">Fin de rétractation acheteur (10 j)</span><span class="val">'+plus(10)+'</span></div>';
+  html+='<div class="metric"><span class="lab">Condition suspensive de prêt (~45 à 60 j)</span><span class="val">'+plus(45)+' → '+plus(60)+'</span></div>';
+  html+='<div class="metric"><span class="lab">Acte authentique (~3 mois)</span><span class="val">'+plus(90)+'</span></div>';
+  html+='<div class="note" style="margin-top:12px">Vérifiez que vos diagnostics seront encore valides à la date de l\'acte (étape 1) : les plus courts (ERP, termites) ne tiennent que 6 mois.</div>';
+  box.innerHTML=html;
+}
 const INTEREST=[
   {v:"",label:"— à évaluer",cls:""},
   {v:"Curieux",label:"Curieux",cls:"cold"},
@@ -859,7 +953,7 @@ function isPast(d,t){
 }
 function addVisit(){
   s.visits.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-    name:"",date:"",time:"",phone:"",interest:"",notes:""});
+    name:"",date:"",time:"",phone:"",interest:"",notes:"",idseen:false});
   save();renderVisits();
 }
 function renderVisits(){
@@ -902,6 +996,7 @@ function renderVisits(){
           INTEREST.map(o=>'<option value="'+o.v+'">'+o.label+'</option>').join("")+
         '</select></div>'+
         '<div class="field full"><label class="f">Retour après la visite</label><textarea data-k="notes" placeholder="Points appréciés, réserves, suite envisagée…"></textarea></div>'+
+        '<div class="field full"><label class="check" style="border:0;padding:2px 0"><input type="checkbox" data-k="idseen"><span>Pièce d\'identité vue <small>(sécurité — l\'identité n\'est pas enregistrée)</small></span></label></div>'+
       '</div>';
     card.querySelector('[data-k="name"]').value=v.name||"";
     card.querySelector('[data-k="phone"]').value=v.phone||"";
@@ -909,6 +1004,9 @@ function renderVisits(){
     card.querySelector('[data-k="time"]').value=v.time||"";
     card.querySelector('[data-k="interest"]').value=v.interest||"";
     card.querySelector('[data-k="notes"]').value=v.notes||"";
+    const idEl=card.querySelector('[data-k="idseen"]');
+    idEl.checked=!!v.idseen;
+    idEl.addEventListener("change",e=>{v.idseen=e.target.checked;save();});
     ["name","phone","notes"].forEach(k=>{
       card.querySelector('[data-k="'+k+'"]').addEventListener("input",e=>{v[k]=e.target.value;save();});
     });
@@ -990,7 +1088,7 @@ document.querySelectorAll("[data-field]").forEach(el=>{
     save();
     if(["property_type","build_year","is_condo","elec_over_15","has_gas","gas_over_15","zone_termites","assainissement_nc","dpe_rating"].includes(f)){renderDiag();}
     if(f==="is_condo")renderDocs();
-    renderAnnonce();renderStepper();
+    renderAnnonce();renderStepper();renderNet();renderPlan();
   });
 });
 document.querySelectorAll("[data-offer]").forEach(el=>{
@@ -998,7 +1096,7 @@ document.querySelectorAll("[data-offer]").forEach(el=>{
   el.addEventListener(ev,()=>{
     const f=el.dataset.offer;
     s.offer[f]=el.type==="checkbox"?el.checked:(el.type==="number"?(el.value===""?0:+el.value):el.value);
-    save();renderOffer();renderStepper();
+    save();renderOffer();renderStepper();renderNet();
   });
 });
 
@@ -1134,20 +1232,21 @@ document.getElementById("importFile").onchange=function(e){
     try{s=Object.assign({},DEFAULT,JSON.parse(rd.result));
     s.offer=Object.assign({},DEFAULT.offer,s.offer||{});
     s.visits=Array.isArray(s.visits)?s.visits.slice():[];
-    s.shots=Object.assign({},s.shots||{});save();renderAll();}
+    s.shots=Object.assign({},s.shots||{});
+    s.diag_dates=Object.assign({},s.diag_dates||{});save();renderAll();}
     catch(err){alert("Fichier JSON invalide.");}
   };
   rd.readAsText(file);
 };
 document.getElementById("resetBtn").onclick=function(){
   if(confirm("Effacer tout le dossier ? Cette action est irréversible."))
-    {s=Object.assign({},DEFAULT);s.offer=Object.assign({},DEFAULT.offer);s.visits=[];s.shots={};save();renderAll();}
+    {s=Object.assign({},DEFAULT);s.offer=Object.assign({},DEFAULT.offer);s.visits=[];s.shots={};s.diag_dates={};save();renderAll();}
 };
 
 function renderAll(){hydrate();renderStepper();renderDiag();renderDocs();
   renderCheckList("qualifList",QUALIF,s.qualif);
   renderCheckList("notaireList",NOTAIRE,s.notaire);
-  renderAnnonce();renderOffer();renderVisits();renderShots();showPanel();qEl.value=s.address||"";
+  renderAnnonce();renderOffer();renderVisits();renderShots();renderNet();renderPlan();showPanel();qEl.value=s.address||"";
   updateProgressBar();}
 renderAll();
 </script>
