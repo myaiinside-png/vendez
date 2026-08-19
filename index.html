@@ -481,6 +481,26 @@
         <strong>Mettre en valeur, sans tromper :</strong> rangez et dégagez chaque pièce, ouvrez volets et rideaux pour la lumière naturelle, photographiez depuis un angle de la pièce pour montrer le volume, et visez une journée claire. Pour le jardin, tondez, rangez le mobilier et privilégiez la fin d'après-midi. Montrez le bien tel qu'il est : les photos donnent envie de visiter, la visite fait le reste.
       </div>
     </div>
+
+    <div class="card">
+      <h3>Regard honnête sur le bien</h3>
+      <p class="hint" style="margin-top:-6px;margin-bottom:14px">Un point lucide, pour vous : il aide à fixer le juste prix, à préparer vos réponses en visite et à rester transparent sans surjouer. Ces notes restent sur votre appareil et n'apparaissent pas dans l'annonce.</p>
+      <div class="grid2">
+        <div class="field" style="margin:0">
+          <label class="f" for="hstrong">Atouts réels <span class="pill ok">à valoriser</span></label>
+          <textarea id="hstrong" data-field="honest_strong" placeholder="Exposition sud, toiture refaite en 2019, quartier calme et proche des écoles…"></textarea>
+          <p class="hint">Ces atouts inspirent le champ « Points forts » de l'annonce et le choix des photos.</p>
+        </div>
+        <div class="field" style="margin:0">
+          <label class="f" for="hwatch">Points de vigilance <span class="pill req">à anticiper</span></label>
+          <textarea id="hwatch" data-field="honest_watch" placeholder="Cuisine à rafraîchir, DPE classe E, un peu de bruit côté rue…"></textarea>
+          <p class="hint">Pour vous : ajustez le prix en conséquence et préparez une réponse honnête à chaque point.</p>
+        </div>
+      </div>
+      <div class="note" style="margin-top:16px">
+        <strong>Jusqu'où être transparent dans l'annonce ?</strong> La transparence légale passe par les diagnostics, le DPE et le notaire — pas par une liste de défauts. Mentionner honnêtement un « travaux à prévoir » peut rassurer et filtrer les visites ; inutile, en revanche, de dérouler chaque faiblesse : la visite s'en charge, dossier en main.
+      </div>
+    </div>
   </section>
 
   <!-- STEP 4 -->
@@ -664,6 +684,7 @@ const DEFAULT={
   dpe_rating:"",ges_rating:"",energy_cost_min:900,energy_cost_max:1300,
   price_target:255000,
   description_extra:"Maison lumineuse avec jardin au calme, proche des écoles.",
+  honest_strong:"",honest_watch:"",
   diagnostics_done:[],docs:{},qualif:{},notaire:{},visits:[],shots:{},
   offer:{price:0,apport:0,loan:0,bank_ok:false,status:"Aucune"}
 };
