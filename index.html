@@ -471,6 +471,16 @@
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <h3>Préparer les photos</h3>
+      <p class="hint" style="margin-top:-6px;margin-bottom:14px">Les photos se déposent directement sur le site de diffusion (Leboncoin, PAP…), à côté du texte ci-dessus. Une bonne série de photos est le premier levier de clics : voici quoi préparer.</p>
+      <div id="shotsList"></div>
+      <p class="hint" id="shotsCount" style="margin-top:12px"></p>
+      <div class="note warn" style="margin-top:14px">
+        <strong>Mettre en valeur, sans tromper :</strong> rangez et dégagez chaque pièce, ouvrez volets et rideaux pour la lumière naturelle, photographiez depuis un angle de la pièce pour montrer le volume, et visez une journée claire. Pour le jardin, tondez, rangez le mobilier et privilégiez la fin d'après-midi. Montrez le bien tel qu'il est : les photos donnent envie de visiter, la visite fait le reste.
+      </div>
+    </div>
   </section>
 
   <!-- STEP 4 -->
@@ -569,6 +579,16 @@
     <h2 id="faqTitle">Vendre de gré à gré, en clair</h2>
 
     <details class="qa">
+      <summary>Concrètement, qu'est-ce que je gagne à vendre sans agence ?</summary>
+      <div class="qa-body">D'abord une économie directe : la commission d'agence, en général entre 4 % et 8 % du prix, ne s'applique pas. Sur votre prix actuel, cela représenterait environ <strong><span id="faqSaving">plusieurs milliers d'euros</span></strong> (estimation à 5 %). Vous gardez aussi la main sur tout : le prix, le calendrier des visites, le ton de l'annonce, et un contact direct avec l'acheteur — sans mandat d'exclusivité qui vous lie les mains. En contrepartie, c'est vous qui gérez les visites et le premier tri des acheteurs : c'est précisément ce que cet outil vous aide à organiser.</div>
+    </details>
+
+    <details class="qa">
+      <summary>Que faire de la commission économisée ?</summary>
+      <div class="qa-body">Plusieurs stratégies, selon votre priorité. <strong>Vendre plus vite</strong> : afficher un prix légèrement sous le marché tout en conservant le même montant net qu'avec une agence. <strong>Valoriser le bien</strong> : financer un rafraîchissement qui accélère la vente — refaire une cuisine, moderniser une salle de bains, un coup de peinture, voire des travaux d'amélioration énergétique qui font gagner une lettre au DPE. <strong>Préparer la suite</strong> : couvrir une partie des frais de notaire de votre prochain achat, ou vos frais de déménagement. L'économie n'est pas qu'un chiffre : c'est une marge de manœuvre sur toute l'opération.</div>
+    </details>
+
+    <details class="qa">
       <summary>Suis-je obligé de passer par un notaire ?</summary>
       <div class="qa-body">Oui. L'acte de vente définitif est obligatoirement signé devant notaire. En revanche, aucune agence n'est requise, et un seul notaire peut suffire pour les deux parties, sans surcoût : ses émoluments sont fixés par barème, pas doublés.</div>
     </details>
@@ -644,12 +664,13 @@ const DEFAULT={
   dpe_rating:"",ges_rating:"",energy_cost_min:900,energy_cost_max:1300,
   price_target:255000,
   description_extra:"Maison lumineuse avec jardin au calme, proche des écoles.",
-  diagnostics_done:[],docs:{},qualif:{},notaire:{},visits:[],
+  diagnostics_done:[],docs:{},qualif:{},notaire:{},visits:[],shots:{},
   offer:{price:0,apport:0,loan:0,bank_ok:false,status:"Aucune"}
 };
 let s=Object.assign({},DEFAULT,store.get()||{});
 s.offer=Object.assign({},DEFAULT.offer,s.offer||{});
 s.visits=Array.isArray(s.visits)?s.visits.slice():[];
+s.shots=Object.assign({},s.shots||{});
 function save(){store.set(s);flash();}
 let flashT;
 function flash(){const el=document.getElementById("saveState");el.textContent="Enregistré ✓";
@@ -773,6 +794,7 @@ function renderAnnonce(){
 "- Risques auxquels ce bien est exposé : www.georisques.gouv.fr\n\n"+
 "Premier contact par message ou téléphone. Agences s'abstenir, merci.";
   document.getElementById("annonce").textContent=t;
+  updateFaqSaving();
 }
 function renderOffer(){
   const o=s.offer,box=document.getElementById("offerAnalysis");
@@ -879,6 +901,37 @@ function renderVisits(){
   });
 }
 document.getElementById("addVisitBtn").addEventListener("click",addVisit);
+
+const SHOTS=[
+  {k:"facade",l:"Façade / entrée",t:"De jour, ciel dégagé, sans voiture ni poubelle dans le cadre."},
+  {k:"sejour",l:"Séjour / pièce de vie",t:"Volets ouverts, depuis l'angle qui montre le plus de volume."},
+  {k:"cuisine",l:"Cuisine",t:"Plans de travail dégagés, sans vaisselle ni éponge apparente."},
+  {k:"chambres",l:"Chambre(s)",t:"Lit fait, sols dégagés ; une photo par chambre principale."},
+  {k:"sdb",l:"Salle de bains",t:"Miroir propre, linge rangé, abattant fermé."},
+  {k:"jardin",l:"Jardin / extérieur",t:"Pelouse tondue, mobilier en place, de préférence en fin d'après-midi."},
+  {k:"atout",l:"L'atout du bien",t:"Ce qui vous distingue : vue, cheminée, poutres, terrasse, luminosité…"}
+];
+function renderShots(){
+  const box=document.getElementById("shotsList");if(!box)return;
+  box.innerHTML="";
+  SHOTS.forEach(sh=>{
+    const done=!!s.shots[sh.k];
+    const lab=document.createElement("label");lab.className="check";
+    lab.innerHTML='<input type="checkbox"'+(done?" checked":"")+'><span>'+sh.l+
+      ' <span class="pill '+(done?"ok":"req")+'">'+(done?"prise":"à faire")+'</span>'+
+      '<small>'+sh.t+'</small></span>';
+    lab.querySelector("input").onchange=e=>{s.shots[sh.k]=e.target.checked;save();renderShots();};
+    box.appendChild(lab);
+  });
+  const n=SHOTS.filter(sh=>s.shots[sh.k]).length;
+  const c=document.getElementById("shotsCount");
+  if(c)c.textContent=n+" / "+SHOTS.length+" prise"+(n>1?"s":"")+" recommandée"+(n>1?"s":"")+" prête"+(n>1?"s":"")+".";
+}
+function updateFaqSaving(){
+  const el=document.getElementById("faqSaving");if(!el)return;
+  const p=Number(s.price_target)||0;
+  el.textContent = p>0 ? eur(Math.round(p*0.05)) : "plusieurs milliers d'euros";
+}
 
 function showPanel(){
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",+p.dataset.step===s.step));
@@ -1059,20 +1112,21 @@ document.getElementById("importFile").onchange=function(e){
   rd.onload=function(){
     try{s=Object.assign({},DEFAULT,JSON.parse(rd.result));
     s.offer=Object.assign({},DEFAULT.offer,s.offer||{});
-    s.visits=Array.isArray(s.visits)?s.visits.slice():[];save();renderAll();}
+    s.visits=Array.isArray(s.visits)?s.visits.slice():[];
+    s.shots=Object.assign({},s.shots||{});save();renderAll();}
     catch(err){alert("Fichier JSON invalide.");}
   };
   rd.readAsText(file);
 };
 document.getElementById("resetBtn").onclick=function(){
   if(confirm("Effacer tout le dossier ? Cette action est irréversible."))
-    {s=Object.assign({},DEFAULT);s.offer=Object.assign({},DEFAULT.offer);s.visits=[];save();renderAll();}
+    {s=Object.assign({},DEFAULT);s.offer=Object.assign({},DEFAULT.offer);s.visits=[];s.shots={};save();renderAll();}
 };
 
 function renderAll(){hydrate();renderStepper();renderDiag();renderDocs();
   renderCheckList("qualifList",QUALIF,s.qualif);
   renderCheckList("notaireList",NOTAIRE,s.notaire);
-  renderAnnonce();renderOffer();renderVisits();showPanel();qEl.value=s.address||"";
+  renderAnnonce();renderOffer();renderVisits();renderShots();showPanel();qEl.value=s.address||"";
   updateProgressBar();}
 renderAll();
 </script>
