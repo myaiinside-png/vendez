@@ -269,6 +269,49 @@
   .tooltip-trigger:hover::after {
       transform: translateX(-50%) scale(1);
   }
+
+  /* ===== GESTION DES VISITES ===== */
+  .visits-summary{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:12.5px;
+    color:var(--ink-soft);margin:0 0 6px}
+  .visits-summary span{white-space:nowrap}
+  .visits-summary b{color:var(--pine-ink);font-weight:600}
+  .visit{border:1px solid var(--line);border-radius:9px;background:#fff;padding:14px;margin-top:12px}
+  .visit.past{background:var(--card)}
+  .visit-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}
+  .visit-when{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft)}
+  .visit-when b{color:var(--ink);font-weight:600}
+  .visit-grid{display:grid;gap:12px}
+  @media(min-width:560px){.visit-grid{grid-template-columns:1fr 1fr}}
+  .visit-grid .field{margin:0}
+  .visit-grid .full{grid-column:1/-1}
+  .del{background:transparent;border:1px solid var(--line);color:var(--brick);
+    border-radius:7px;padding:5px 11px;font:inherit;font-size:12.5px;cursor:pointer;flex:0 0 auto}
+  .del:hover{border-color:var(--brick);background:var(--brick-soft)}
+  .pill.hot{background:var(--pine-soft);color:var(--pine-ink)}
+  .pill.warm{background:var(--ochre-soft);color:var(--ochre-ink)}
+  .pill.cold{background:var(--line-soft);color:var(--ink-soft)}
+  .pill.out{background:var(--brick-soft);color:#7a2c1e}
+  .visit-empty{color:var(--ink-soft);font-size:14px;padding:6px 0;margin:0}
+
+  /* ===== FAQ ===== */
+  .faq{margin-top:36px}
+  .faq .eyebrow{margin-bottom:4px}
+  .faq h2{font-size:20px;margin:0 0 14px}
+  details.qa{border:1px solid var(--line);border-radius:9px;background:var(--card);
+    padding:0 16px;margin-top:10px}
+  details.qa[open]{background:#fff;border-color:#c9c5b8}
+  details.qa summary{list-style:none;cursor:pointer;padding:14px 0;font-family:var(--serif);
+    font-size:15.5px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;
+    align-items:center;gap:12px}
+  details.qa summary:hover{color:var(--pine-ink)}
+  details.qa summary::-webkit-details-marker{display:none}
+  details.qa summary::after{content:"+";font-family:var(--mono);font-size:19px;line-height:1;
+    color:var(--pine);flex:0 0 auto}
+  details.qa[open] summary::after{content:"–"}
+  details.qa .qa-body{padding:0 0 16px;font-size:14.5px;color:var(--ink-soft);line-height:1.62;
+    max-width:64ch}
+  details.qa .qa-body a{color:var(--pine-ink)}
+  .faq .qa-foot{font-size:13px;color:var(--ink-soft);margin:16px 0 0}
 </style>
 </head>
 <body>
@@ -433,10 +476,24 @@
   <!-- STEP 4 -->
   <section class="panel" data-step="4" aria-labelledby="t4">
     <p class="eyebrow">Étape 4 sur 6</p>
-    <h2 id="t4">Qualifier les visiteurs</h2>
-    <p class="lead">Avant de bloquer votre bien pour un acheteur, vérifiez qu'il est sérieux et solvable.</p>
+    <h2 id="t4">Organiser les visites et qualifier les acheteurs</h2>
+    <p class="lead">Planifiez vos visites, gardez une trace de chaque acheteur rencontré, puis vérifiez que le plus sérieux tient financièrement la route.</p>
+
     <div class="card">
-      <h3>Grille de vérification</h3>
+      <h3>Agenda des visites</h3>
+      <div class="visits-summary" id="visitsSummary"></div>
+      <div id="visitsList"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn mini" id="addVisitBtn" type="button">+ Ajouter une visite</button>
+      </div>
+      <div class="note" style="margin-top:16px">
+        <strong>À garder sous la main pendant la visite :</strong> le dossier de diagnostics complet (à remettre dès la première visite pour une maison classée E, F ou G), le titre de propriété et le dernier avis de taxe foncière. Notez le retour de chaque visiteur juste après son départ, tant que l'impression est fraîche.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Grille de qualification de l'acheteur</h3>
+      <p class="hint" style="margin-top:-6px;margin-bottom:12px">À vérifier avant de réserver votre bien pour un acheteur précis.</p>
       <div id="qualifList"></div>
     </div>
     <div class="note alert"><strong>Sécurité :</strong> ne signez jamais une offre d'achat sans avoir vu une attestation de faisabilité financière récente, rédigée par la banque de l'acheteur ou son courtier.</div>
@@ -507,6 +564,58 @@
     <button class="btn" id="nextBtn">Étape suivante →</button>
   </div>
 
+  <section class="faq" aria-labelledby="faqTitle">
+    <p class="eyebrow">Questions fréquentes</p>
+    <h2 id="faqTitle">Vendre de gré à gré, en clair</h2>
+
+    <details class="qa">
+      <summary>Suis-je obligé de passer par un notaire ?</summary>
+      <div class="qa-body">Oui. L'acte de vente définitif est obligatoirement signé devant notaire. En revanche, aucune agence n'est requise, et un seul notaire peut suffire pour les deux parties, sans surcoût : ses émoluments sont fixés par barème, pas doublés.</div>
+    </details>
+
+    <details class="qa">
+      <summary>Vendre sans agence, est-ce bien légal ?</summary>
+      <div class="qa-body">Tout à fait. Aucun mandat n'est obligatoire pour vendre son propre bien. Vous gérez l'annonce, les visites et la négociation ; le notaire, lui, sécurise l'acte et vérifie que tout est en règle.</div>
+    </details>
+
+    <details class="qa">
+      <summary>Combien de temps prend une vente entre particuliers ?</summary>
+      <div class="qa-body">Comptez en général 3 à 4 mois entre la signature du compromis et l'acte définitif — le temps que l'acheteur obtienne son prêt et que le notaire réunisse les pièces (urbanisme, purge des droits de préemption, etc.). La recherche d'acheteur, en amont, dépend surtout du juste prix.</div>
+    </details>
+
+    <details class="qa">
+      <summary>Qui paie les « frais de notaire » ?</summary>
+      <div class="qa-body">L'acheteur, dans la très grande majorité des ventes. Ces frais — surtout des taxes reversées à l'État — s'ajoutent au prix. Une clause « acte en main » peut les mettre à la charge du vendeur, mais c'est rare et se formalise avec l'étude.</div>
+    </details>
+
+    <details class="qa">
+      <summary>Dois-je faire tous les diagnostics avant de publier l'annonce ?</summary>
+      <div class="qa-body">Le DPE doit être réalisé et sa classe affichée dès l'annonce. Les autres diagnostics doivent figurer dans le dossier remis à l'acheteur, au plus tard à la signature du compromis. L'étape 1 calcule la liste exacte pour votre bien.</div>
+    </details>
+
+    <details class="qa">
+      <summary>Puis-je me rétracter après avoir signé le compromis ?</summary>
+      <div class="qa-body">Le vendeur, non : il est engagé dès la signature. Seul l'acheteur bénéficie d'un délai de rétractation de 10 jours, sans motif ni pénalité. D'où l'intérêt de bien qualifier l'acheteur en amont (étape 4).</div>
+    </details>
+
+    <details class="qa">
+      <summary>Et si le prêt de l'acheteur est refusé ?</summary>
+      <div class="qa-body">Si le compromis comporte une condition suspensive de prêt (quasi systématique), la vente est annulée et l'acheteur récupère son dépôt, sans pénalité. C'est normal : ne considérez la vente comme sûre qu'une fois l'accord de prêt définitif obtenu.</div>
+    </details>
+
+    <details class="qa">
+      <summary>Comment fixer le bon prix sans agence ?</summary>
+      <div class="qa-body">Appuyez-vous sur les ventes réelles autour de chez vous (base DVF, lien fourni à l'étape 1 une fois l'adresse saisie), comparez à surface et état équivalents, et méfiez-vous de la surestimation : un bien trop cher se vend plus lentement et finit souvent sous le prix d'un bien correctement estimé au départ.</div>
+    </details>
+
+    <details class="qa">
+      <summary>Vais-je payer un impôt sur la plus-value ?</summary>
+      <div class="qa-body">La vente de votre résidence principale en est exonérée. Pour une résidence secondaire ou un investissement, une plus-value peut être taxée, avec des abattements selon la durée de détention. Le notaire la calcule et la prélève à l'acte — anticipez la question avec lui.</div>
+    </details>
+
+    <p class="qa-foot">Ces réponses donnent les grandes lignes. Pour votre situation précise, votre notaire reste l'interlocuteur de référence. Informations officielles : <a href="https://www.service-public.fr/particuliers/vosdroits/N320" target="_blank" rel="noopener">service-public.fr ↗</a></p>
+  </section>
+
   <footer>
     <div class="tools">
       <button class="btn ghost mini" id="exportBtn">Sauvegarder le dossier (.json)</button>
@@ -535,11 +644,12 @@ const DEFAULT={
   dpe_rating:"",ges_rating:"",energy_cost_min:900,energy_cost_max:1300,
   price_target:255000,
   description_extra:"Maison lumineuse avec jardin au calme, proche des écoles.",
-  diagnostics_done:[],docs:{},qualif:{},notaire:{},
+  diagnostics_done:[],docs:{},qualif:{},notaire:{},visits:[],
   offer:{price:0,apport:0,loan:0,bank_ok:false,status:"Aucune"}
 };
 let s=Object.assign({},DEFAULT,store.get()||{});
 s.offer=Object.assign({},DEFAULT.offer,s.offer||{});
+s.visits=Array.isArray(s.visits)?s.visits.slice():[];
 function save(){store.set(s);flash();}
 let flashT;
 function flash(){const el=document.getElementById("saveState");el.textContent="Enregistré ✓";
@@ -684,6 +794,92 @@ function renderOffer(){
   box.innerHTML=html;
 }
 
+const INTEREST=[
+  {v:"",label:"— à évaluer",cls:""},
+  {v:"Curieux",label:"Curieux",cls:"cold"},
+  {v:"Intéressé",label:"Intéressé",cls:"warm"},
+  {v:"Très intéressé",label:"Très intéressé",cls:"hot"},
+  {v:"Non retenu",label:"Non retenu",cls:"out"}
+];
+function fmtVisitDate(d,t){
+  if(!d)return "Date à définir";
+  const dt=new Date(d+"T"+(t||"00:00"));
+  if(isNaN(dt))return "Date à définir";
+  let str=dt.toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short"});
+  if(t)str+=" · "+t;
+  return str.charAt(0).toUpperCase()+str.slice(1);
+}
+function isPast(d,t){
+  if(!d)return false;
+  const dt=new Date(d+"T"+(t||"23:59"));
+  return !isNaN(dt)&&dt.getTime()<Date.now();
+}
+function addVisit(){
+  s.visits.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    name:"",date:"",time:"",phone:"",interest:"",notes:""});
+  save();renderVisits();
+}
+function renderVisits(){
+  const box=document.getElementById("visitsList");if(!box)return;
+  const sum=document.getElementById("visitsSummary");
+  const total=s.visits.length;
+  const upcoming=s.visits.filter(v=>v.date&&!isPast(v.date,v.time)).length;
+  const pastCount=s.visits.filter(v=>isPast(v.date,v.time)).length;
+  if(sum){
+    sum.innerHTML= total===0 ? "" :
+      "<span><b>"+total+"</b> visite"+(total>1?"s":"")+"</span>"+
+      "<span><b>"+upcoming+"</b> à venir</span>"+
+      "<span><b>"+pastCount+"</b> passée"+(pastCount>1?"s":"")+"</span>";
+  }
+  if(total===0){
+    box.innerHTML='<p class="visit-empty">Aucune visite pour le moment. Ajoutez-en une dès qu\'un acheteur prend rendez-vous.</p>';
+    return;
+  }
+  const list=s.visits.slice().sort((a,b)=>{
+    const ka=(a.date||"9999-99-99")+(a.time||"99:99"),kb=(b.date||"9999-99-99")+(b.time||"99:99");
+    return ka<kb?-1:ka>kb?1:0;
+  });
+  box.innerHTML="";
+  list.forEach(v=>{
+    const past=isPast(v.date,v.time);
+    const it=INTEREST.find(x=>x.v===v.interest)||INTEREST[0];
+    const badge=v.interest?' <span class="pill '+it.cls+'">'+it.label+'</span>'
+                          :' <span class="pill cold">'+(past?"à évaluer":"à venir")+'</span>';
+    const card=document.createElement("div");
+    card.className="visit"+(past?" past":"");
+    card.innerHTML=
+      '<div class="visit-top"><span class="visit-when"><b>'+fmtVisitDate(v.date,v.time)+'</b>'+badge+
+        '</span><button class="del" type="button">Supprimer</button></div>'+
+      '<div class="visit-grid">'+
+        '<div class="field"><label class="f">Nom du visiteur</label><input type="text" data-k="name" placeholder="Prénom, nom"></div>'+
+        '<div class="field"><label class="f">Téléphone / contact</label><input type="text" data-k="phone" placeholder="06…"></div>'+
+        '<div class="field"><label class="f">Date</label><input type="date" data-k="date"></div>'+
+        '<div class="field"><label class="f">Heure</label><input type="time" data-k="time"></div>'+
+        '<div class="field full"><label class="f">Niveau d\'intérêt</label><select data-k="interest">'+
+          INTEREST.map(o=>'<option value="'+o.v+'">'+o.label+'</option>').join("")+
+        '</select></div>'+
+        '<div class="field full"><label class="f">Retour après la visite</label><textarea data-k="notes" placeholder="Points appréciés, réserves, suite envisagée…"></textarea></div>'+
+      '</div>';
+    card.querySelector('[data-k="name"]').value=v.name||"";
+    card.querySelector('[data-k="phone"]').value=v.phone||"";
+    card.querySelector('[data-k="date"]').value=v.date||"";
+    card.querySelector('[data-k="time"]').value=v.time||"";
+    card.querySelector('[data-k="interest"]').value=v.interest||"";
+    card.querySelector('[data-k="notes"]').value=v.notes||"";
+    ["name","phone","notes"].forEach(k=>{
+      card.querySelector('[data-k="'+k+'"]').addEventListener("input",e=>{v[k]=e.target.value;save();});
+    });
+    ["date","time","interest"].forEach(k=>{
+      card.querySelector('[data-k="'+k+'"]').addEventListener("change",e=>{v[k]=e.target.value;save();renderVisits();});
+    });
+    card.querySelector(".del").addEventListener("click",()=>{
+      s.visits=s.visits.filter(x=>x.id!==v.id);save();renderVisits();
+    });
+    box.appendChild(card);
+  });
+}
+document.getElementById("addVisitBtn").addEventListener("click",addVisit);
+
 function showPanel(){
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",+p.dataset.step===s.step));
   document.getElementById("prevBtn").style.visibility=s.step>1?"visible":"hidden";
@@ -824,6 +1020,13 @@ function buildPdfContent() {
     var diagList = requiredDiagnostics().map(function(d) {
         return '<li>' + d.l + ' ' + (s.diagnostics_done.includes(d.k) ? '✅' : '⬜') + '</li>';
     }).join('');
+    var visitsHtml = (s.visits && s.visits.length)
+        ? s.visits.map(function(v){
+            return '<li>' + fmtVisitDate(v.date, v.time) + ' — ' + (v.name || 'visiteur') +
+                   (v.interest ? ' · ' + v.interest : '') +
+                   (v.notes ? '<br><span style="color:#666;font-size:12px;">' + v.notes + '</span>' : '') + '</li>';
+          }).join('')
+        : '<li>Aucune visite enregistrée</li>';
     return '<div style="padding:20px;max-width:700px;font-family:Arial,sans-serif;">' +
         '<h1 style="color:#1E6B52;border-bottom:3px solid #1E6B52;padding-bottom:10px;">📋 Dossier de Vente</h1>' +
         '<p style="color:#666;font-size:12px;">Généré le ' + new Date().toLocaleDateString('fr-FR') + '</p>' +
@@ -838,6 +1041,7 @@ function buildPdfContent() {
         '<h2 style="color:#1E6B52;margin-top:20px;">3. Prix</h2>' +
         '<ul><li><strong>Prix affiché :</strong> ' + eur(s.price_target) + '</li>' +
         '<li><strong>Statut :</strong> ' + s.offer.status + '</li></ul>' +
+        '<h2 style="color:#1E6B52;margin-top:20px;">4. Visites</h2><ul>' + visitsHtml + '</ul>' +
         '<hr style="border:1px solid #ddd;margin:30px 0;">' +
         '<p style="color:#999;font-size:11px;text-align:center;">Généré par "De gré à gré" — outil libre et gratuit.<br>⚠️ Ce document ne remplace pas l\'avis d\'un notaire.</p>' +
         '</div>';
@@ -854,20 +1058,21 @@ document.getElementById("importFile").onchange=function(e){
   const rd=new FileReader();
   rd.onload=function(){
     try{s=Object.assign({},DEFAULT,JSON.parse(rd.result));
-    s.offer=Object.assign({},DEFAULT.offer,s.offer||{});save();renderAll();}
+    s.offer=Object.assign({},DEFAULT.offer,s.offer||{});
+    s.visits=Array.isArray(s.visits)?s.visits.slice():[];save();renderAll();}
     catch(err){alert("Fichier JSON invalide.");}
   };
   rd.readAsText(file);
 };
 document.getElementById("resetBtn").onclick=function(){
   if(confirm("Effacer tout le dossier ? Cette action est irréversible."))
-    {s=Object.assign({},DEFAULT);s.offer=Object.assign({},DEFAULT.offer);save();renderAll();}
+    {s=Object.assign({},DEFAULT);s.offer=Object.assign({},DEFAULT.offer);s.visits=[];save();renderAll();}
 };
 
 function renderAll(){hydrate();renderStepper();renderDiag();renderDocs();
   renderCheckList("qualifList",QUALIF,s.qualif);
   renderCheckList("notaireList",NOTAIRE,s.notaire);
-  renderAnnonce();renderOffer();showPanel();qEl.value=s.address||"";
+  renderAnnonce();renderOffer();renderVisits();showPanel();qEl.value=s.address||"";
   updateProgressBar();}
 renderAll();
 </script>
